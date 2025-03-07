@@ -21,6 +21,14 @@ struct CapsuleText: View {
     }
 }
 
+struct ProminentTitle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.largeTitle.bold())
+            .foregroundColor(.blue)
+    }
+}
+
 struct Title: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -36,6 +44,10 @@ struct Title: ViewModifier {
 extension View {
     func titleStyle() -> some View {
         modifier(Title())
+    }
+    
+    func prominentTitleStyle() -> some View {
+        modifier(ProminentTitle())
     }
     
     func watermarked(with text: String) -> some View {
@@ -85,10 +97,11 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Text("dd").modifier(Title())
-            Text("dd2").titleStyle()
+            Text("modifier").modifier(Title())
+            Text("modifier 뷰로해서 빼기").titleStyle()
+            Text("Prominent").prominentTitleStyle()
             
-            CapsuleText(text: "Button")
+            CapsuleText(text: "CapsuleText")
                 .foregroundColor(.yellow)
             
             motto1.foregroundColor(.pink)
