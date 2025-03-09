@@ -7,25 +7,15 @@
 
 import SwiftUI
 
-struct CapsuleText: View {
+struct CapsuleButton: View {
     var text: String
     
     var body: some View {
         Text(text)
-            .font(.largeTitle)
+            .font(.title)
             .padding()
-        // 여기서 지워야 밑에서 가져다쓸 때 속성을 덮을 수 있음.
-//            .foregroundStyle(.white)
-            .background(.blue)
+            .background(Color.blue)
             .clipShape(.capsule)
-    }
-}
-
-struct ProminentTitle: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .font(.largeTitle.bold())
-            .foregroundColor(.blue)
     }
 }
 
@@ -36,22 +26,7 @@ struct Title: ViewModifier {
             .foregroundColor(.white)
             .padding()
             .background(.blue)
-            .clipShape(.rect(cornerRadius: 10))
-    }
-}
-
-// extension of view!
-extension View {
-    func titleStyle() -> some View {
-        modifier(Title())
-    }
-    
-    func prominentTitleStyle() -> some View {
-        modifier(ProminentTitle())
-    }
-    
-    func watermarked(with text: String) -> some View {
-        modifier(Watermark(text: text))
+            .cornerRadius(10)
     }
 }
 
@@ -64,24 +39,36 @@ struct Watermark: ViewModifier {
             
             Text(text)
                 .font(.caption)
-                .foregroundStyle(.white)
+                .foregroundColor(.white)
                 .padding()
                 .background(.black)
         }
     }
 }
 
+extension View {
+    func titleStyle() -> some View {
+        modifier(Title())
+    }
+    
+    func watermark(with text: String) -> some View {
+        modifier(Watermark(text: text))
+    }
+}
+
+// 이렇게 뷰를 그릴때는!
 struct GridStack<Content: View>: View {
     let rows: Int
     let columns: Int
     @ViewBuilder let content: (Int, Int) -> Content
     
+    // var body: some View {}!!!
     var body: some View {
         VStack {
+            // 그리드스택 그릴 때 아이디 값 넣어주기-> 그래야 워닝 없어짐!
             ForEach(0..<rows, id: \.self) { row in
                 HStack {
-                    ForEach(0..<columns, id: \.self) {
-                        column in
+                    ForEach(0..<columns, id: \.self) { column in
                         content(row, column)
                     }
                 }
@@ -91,38 +78,25 @@ struct GridStack<Content: View>: View {
 }
 
 struct ContentView: View {
-    @State private var useRedText = false
-    let motto1 = Text("motto1")
-    let motto2 = Text("motto2")
+    @State private var toggleRed = false
     
     var body: some View {
-        VStack {
-            Text("modifier").modifier(Title())
-            Text("modifier 뷰로해서 빼기").titleStyle()
-            Text("Prominent").prominentTitleStyle()
-            
-            CapsuleText(text: "CapsuleText")
-                .foregroundColor(.yellow)
-            
-            motto1.foregroundColor(.pink)
-            motto2
-            
-            Color.blue
-                .frame(width: 300, height: 200)
-                .watermarked(with: "Watermark")
-            
-            GridStack(rows: 4, columns: 4) {
-                row, col in
-                Image(systemName: "\(row * 4 + col).circle")
-                Text("R\(row) C\(col)")
-            }.font(.subheadline)
-        }
-        .font(.title)
+        Button("Toggle red") {
+            toggleRed.toggle()
+        }.foregroundColor(toggleRed ? .red : .primary)
         
-//        Button("Toggle Red Text") {
-//            useRedText.toggle()
-//        }
-//        .foregroundColor(useRedText ? .red : .blue)
+        Text("Title").modifier(Title())
+        Text("titleStyle").titleStyle()
+        CapsuleButton(text: "capsule").foregroundColor(.yellow)
+        
+        Color.pink
+            .frame(width: 200, height: 200)
+            .watermark(with: "Watermark")
+        
+        GridStack(rows: 4, columns: 4) { row, column in
+            Image(systemName: "\(row * 4 + column).circle")
+            Text("R\(row) C\(column)")
+        }.font(.subheadline)
     }
 }
 
