@@ -7,22 +7,23 @@
 
 import SwiftUI
 
-struct CapsuleButton: View {
+struct Capsule: View {
     var text: String
     
     var body: some View {
         Text(text)
-            .font(.title)
+            .font(.largeTitle.bold())
+            .foregroundColor(.blue)
             .padding()
-            .background(Color.blue)
+            .background(.yellow)
             .clipShape(.capsule)
     }
 }
 
-struct Title: ViewModifier {
+struct BlueButton: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .font(.largeTitle)
+            .font(.largeTitle.bold())
             .foregroundColor(.white)
             .padding()
             .background(.blue)
@@ -31,7 +32,7 @@ struct Title: ViewModifier {
 }
 
 struct Watermark: ViewModifier {
-    var text: String
+    var text: String = ""
     
     func body(content: Content) -> some View {
         ZStack(alignment: .bottomTrailing) {
@@ -46,30 +47,18 @@ struct Watermark: ViewModifier {
     }
 }
 
-extension View {
-    func titleStyle() -> some View {
-        modifier(Title())
-    }
-    
-    func watermark(with text: String) -> some View {
-        modifier(Watermark(text: text))
-    }
-}
-
-// 이렇게 뷰를 그릴때는!
 struct GridStack<Content: View>: View {
     let rows: Int
-    let columns: Int
+    let cols: Int
+    // @ViewBuilder let content: (Int, Int) -> Content
     @ViewBuilder let content: (Int, Int) -> Content
     
-    // var body: some View {}!!!
     var body: some View {
         VStack {
-            // 그리드스택 그릴 때 아이디 값 넣어주기-> 그래야 워닝 없어짐!
             ForEach(0..<rows, id: \.self) { row in
                 HStack {
-                    ForEach(0..<columns, id: \.self) { column in
-                        content(row, column)
+                    ForEach(0..<cols, id: \.self) { col in
+                        content(row, col)
                     }
                 }
             }
@@ -77,29 +66,41 @@ struct GridStack<Content: View>: View {
     }
 }
 
+extension View {
+    func buttonStyle() -> some View {
+        modifier(BlueButton())
+    }
+    
+    func watermark(_ text: String) -> some View {
+        modifier(Watermark(text: text))
+    }
+}
+
 struct ContentView: View {
     @State private var toggleRed = false
     
     var body: some View {
-        Button("Toggle red") {
-            toggleRed.toggle()
-        }.foregroundColor(toggleRed ? .red : .primary)
-        
-        Text("Title").modifier(Title())
-        Text("titleStyle").titleStyle()
-        CapsuleButton(text: "capsule").foregroundColor(.yellow)
-        
-        Color.pink
-            .frame(width: 200, height: 200)
-            .watermark(with: "Watermark")
-        
-        GridStack(rows: 4, columns: 4) { row, column in
-            Image(systemName: "\(row * 4 + column).circle")
-            Text("R\(row) C\(column)")
-        }.font(.subheadline)
+        VStack {
+            Button("toggle red") {
+                toggleRed.toggle()
+            }.foregroundColor(toggleRed ? .red : .primary)
+            
+            Text("modifier").buttonStyle()
+            Capsule(text: "capsule")
+            Color.pink
+                .frame(width: 200, height: 200)
+                .watermark("Watermaked")
+            
+            // GridStack(row: 3, cols: 3) { row, col in }
+            GridStack(rows: 3, cols: 3) { row, col in
+                Image(systemName: "\(row * 3 + col).circle")
+                Text("\(row),\(col)")
+            }.font(.subheadline)
+        }
     }
+    
 }
-
+   
 #Preview {
     ContentView()
 }
