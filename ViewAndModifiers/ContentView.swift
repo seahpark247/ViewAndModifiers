@@ -91,7 +91,7 @@ struct ContentView: View {
                 .frame(width: 200, height: 200)
                 .watermark("Watermaked")
             
-            // GridStack(row: 3, cols: 3) { row, col in }
+            // GridStack(rows: 3, cols: 3) { row, col in }
             GridStack(rows: 3, cols: 3) { row, col in
                 Image(systemName: "\(row * 3 + col).circle")
                 Text("\(row),\(col)")
